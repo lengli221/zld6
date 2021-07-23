@@ -1,6 +1,8 @@
 #ifndef __SMCOMMANAGER_H
 #define __SMCOMMANAGER_H
 
+#include "type.h"
+
 #define D_SM_TASKID_LCD       						0//显示屏
 #define D_SM_TASKID_CARD			  			1//读卡器
 #define D_SM_ZY_Charger							2//振源充电模块
@@ -65,6 +67,9 @@
 #define D_LCD_CMD_ReadAppointDoorId		0x19
 #define D_LCD_CMD_WriteAppointDoorId		0x1A
 #define D_LCD_CMD_WriteSoftVersion			0x1B
+
+#define D_LCD_CMD_WriteCfgVolCur				0x1C/*电压电流配置*/
+#define D_LCD_CMD_ReadCfgVolCur					0x1D/*读电压电流参数*/
 
 #if Modify_PW_190822 == 1
 #define D_LCD_CMD_ReadModifyPWAscii			0x26

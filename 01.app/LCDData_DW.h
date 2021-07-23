@@ -1,6 +1,8 @@
 #ifndef LCDDATA_DW_H
 #define LCDDATA_DW_H
 
+#include "type.h"
+
 /*
 ** II迪文屏页面控制
 */
@@ -82,6 +84,12 @@
 #define LCD_WriteKeyModeChoiceAddr				(uint16)0x14A0				
 #define LCD_Write_Len_KeyModeChoiceAddr		(uint16)(sizeof(LCD_KeyModeChoice)/sizeof(uint16))
 #endif
+
+/*
+** 配置电压电流
+*/
+#define LCD_WriteModuleVolCurAddr					(uint16)0x1500
+#define LCD_WriteModuleVolCurlen					(uint8)0x03
 
 /*充电记录迪文屏偏移地址设置*/
 #define LCD_WriteRecordAddr							(uint16)0x4000
@@ -185,6 +193,15 @@ typedef struct
 	uint16 smokeIcon[2];//烟感图标 
 	uint16 deviceId[DeviceAddr_MAX];//设备ID
 }LCDSysParam;
+
+/*
+** 配置电压电流
+*/
+typedef struct{
+	uint16 vol;/*电压*/
+	uint16 cur;/*电流*/
+	uint16 ok;/*确认按钮*/
+}LcdCfgModule;
 
 typedef struct
 {
@@ -396,6 +413,30 @@ void LCD_SetKeyModeChoice(LCD_KeyModeChoice lKeyModeChoice);
 bool LCD_WriteKeyModeChoice(void *pData,uint8 dev);
 
 #endif
+
+/*
+** set Module Vol Cur To Lcd
+*/
+void set_ModuleVolCurToLcd(uint16 vol,uint16 cur);
+
+/*
+** chk Module Vol Cur Cfg Is Legal
+**	@return:
+**		-1:未触发“确认按键”
+**		0:参数设置成功
+**		1:参数一致,或设置超限
+*/
+int8 chk_ModuleVolCurCfgIsLegal(void);
+
+/*
+** 配置电压电流 地址:0x1500
+*/
+bool LCD_WriteModuleVolCur(void *pData,uint8 dev);
+
+/*
+** 配置电压电流 地址:0x1500
+*/
+bool LCD_ReadoduleVolCur(void *pData,uint8 dev);
 
 #endif
 

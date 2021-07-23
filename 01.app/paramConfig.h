@@ -30,6 +30,12 @@
 #define LEN_KeySysParam										(sizeof(ParamSysCabinet)+1)
 #endif
 
+/*
+** 配置电压电流
+*/
+#define EAADR_Cfg_ModuleVolCur						(EAADR_KeySysParam + LEN_KeySysParam)
+#define LEN_Cfg_ModuleVolCur							(sizeof(ParamHS)+1)
+
 /*备份区地址直接增加偏移量*/
 #define EADDR_BKPDATOFFSET								1024//备份地址偏移量
 
@@ -117,6 +123,11 @@ void param_SaveParamSysCabinetKey(void);
 ** get HS Volt Cur Limit
 */
 ParamHS get_HSVolCurLimit(void);
+
+/*
+** set HS Vol Cur Limit
+*/
+void set_HSVolCurLimit(uint16 vol,uint16 cur);
 
 #endif
 

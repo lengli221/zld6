@@ -47,7 +47,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\project\keil\output\</OutputDirectory>
-          <OutputName>binai_Release_V</OutputName>
+          <OutputName>binai_Release_V206</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>

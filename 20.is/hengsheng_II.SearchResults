@@ -1,4 +1,0 @@
----- chargerModuleComErr Matches (3 in 3 files) ----
-door_sys_logicCtr_2.c (e:\00.currentsourcecode\01.chargecabinet\21.hengsheng\02.project_ii\01.app):			doorSysParam.doorState[i] = chargerModuleComErr;/*通讯失联即判断仓门异常,更换充电器需重新下电处理*/
-door_sys_logicCtr_2.h (e:\00.currentsourcecode\01.chargecabinet\21.hengsheng\02.project_ii\01.app):	chargerModuleComErr = 0xFC,/*充电器模块通讯异常*/
-LCDData_DW.c (e:\00.currentsourcecode\01.chargecabinet\21.hengsheng\02.project_ii\01.app):			case chargerModuleComErr:/*充电器模块通讯异常*/

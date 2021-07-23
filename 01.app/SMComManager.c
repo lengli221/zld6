@@ -57,7 +57,10 @@ static SM_LogicUnit st_LogicSheetLCD[]=
 	{D_SM_InitiativeCmd,D_LCD_CMD_WriteKeyModeChoice,&SM_LCD_InitiativeFrame,DP_PackageFrame,DP_ParseFrame,LCD_SetData,LCD_WriteKeyModeChoice,null,&OtherComNum,&uiLCDComState,uiLCDComCnt,&uiLCDComFlag},
 	#endif
 
-	{D_SM_InitiativeCmd,D_LCD_CMD_WriteVoiceInfo,&SM_LCD_InitiativeFrame,DP_PackageFrame,DP_ParseFrame,LCD_SetData,lcd_WriteVoiceCtr,null,&OtherComNum,&uiLCDComState,uiLCDComCnt,&uiLCDComFlag}
+	{D_SM_InitiativeCmd,D_LCD_CMD_WriteVoiceInfo,&SM_LCD_InitiativeFrame,DP_PackageFrame,DP_ParseFrame,LCD_SetData,lcd_WriteVoiceCtr,null,&OtherComNum,&uiLCDComState,uiLCDComCnt,&uiLCDComFlag},
+	
+	{D_SM_InitiativeCmd,D_LCD_CMD_WriteCfgVolCur,&SM_LCD_InitiativeFrame,DP_PackageFrame,DP_ParseFrame,LCD_SetData,LCD_WriteModuleVolCur,null,&OtherComNum,&uiLCDComState,uiLCDComCnt,&uiLCDComFlag},
+	{D_SM_InitiativeCmd,D_LCD_CMD_ReadCfgVolCur,&SM_LCD_InitiativeFrame,DP_PackageFrame,DP_ParseFrame,LCD_SetData,LCD_ReadoduleVolCur,null,&OtherComNum,&uiLCDComState,uiLCDComCnt,&uiLCDComFlag}	
 };
 static const uint16 iLogicSheetLCDUnitNum = sizeof(st_LogicSheetLCD)/sizeof(SM_LogicUnit);
 

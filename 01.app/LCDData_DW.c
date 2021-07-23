@@ -30,6 +30,11 @@ static LCD_CancelCardKey lcdCancelCardKey;
 static LCD_KeyModeChoice lcdKeyModeChoice;
 #endif
 
+/*
+** 配置电压电流
+*/
+LcdCfgModule lcdCfgModule = {0};
+
 LCD_CTRLFRAME LCD_CtrlAddrSheets[]=
 {
 	{0x03,&lcdScreenGetCurId.id[0]},
@@ -178,6 +183,11 @@ LCD_DATAFRAME LCD_DataAddrSheets[]=
 	{LCD_WriteKeyModeChoiceAddr,&lcdKeyModeChoice.init},
 	{LCD_WriteKeyModeChoiceAddr+1,&lcdKeyModeChoice.re},
 	#endif
+	
+	/*配置电压电流*/
+	{LCD_WriteModuleVolCurAddr,&lcdCfgModule.vol},
+	{LCD_WriteModuleVolCurAddr+1,&lcdCfgModule.cur},
+	{LCD_WriteModuleVolCurAddr+2,&lcdCfgModule.ok}
 };
 uint16 const LCD_DataAddrSheetsNum = sizeof(LCD_DataAddrSheets) / sizeof(LCD_DATAFRAME);
 
@@ -1470,3 +1480,66 @@ bool LCD_WriteKeyModeChoice(void *pData,uint8 dev)
 }
 #endif
 
+/*
+** set Module Vol Cur To Lcd
+*/
+void set_ModuleVolCurToLcd(uint16 vol,uint16 cur){
+	lcdCfgModule.vol = vol;
+	lcdCfgModule.cur = cur;
+	lcdCfgModule.ok = 0;
+}
+
+/*
+** chk Module Vol Cur Cfg Is Legal
+**	@return:
+**		-1:未触发“确认按键”
+**		0:参数设置成功
+**		1:参数一致,或设置超限
+*/
+int8 chk_ModuleVolCurCfgIsLegal(void){
+	int8 ret = -1;
+	ParamHS pHs = get_HSVolCurLimit();
+	
+	if(lcdCfgModule.ok != 0){
+		if(pHs.volLimit != lcdCfgModule.vol || pHs.curLimit != lcdCfgModule.cur){
+			/*20210723--限制参数韦工提供*/
+			if((lcdCfgModule.vol <= 74)&&(lcdCfgModule.vol >= 40)
+				&&(lcdCfgModule.cur >= 1)&&(lcdCfgModule.cur >= 22)){
+				set_HSVolCurLimit(lcdCfgModule.vol,lcdCfgModule.cur);
+				ret = 0;
+			}else{
+				ret = 1;
+			}
+		}else{
+			ret = 1;
+		}
+	}
+	return ret;
+}
+
+/*
+** 配置电压电流 地址:0x1500
+*/
+bool LCD_WriteModuleVolCur(void *pData,uint8 dev){
+	DP_FramePara *st_FramePara = (DP_FramePara *)pData;
+	if (pData == null)
+		return false;
+	st_FramePara->iAddress = LCD_WriteModuleVolCurAddr;
+	st_FramePara->ucFunCode = D_DP_DataWirte; 
+	st_FramePara->ucRegLen = LCD_WriteModuleVolCurlen;
+	LCD_GetData(st_FramePara);
+	return true;	
+}
+
+/*
+** 配置电压电流 地址:0x1500
+*/
+bool LCD_ReadoduleVolCur(void *pData,uint8 dev){
+	DP_FramePara *st_FramePara = (DP_FramePara *)pData;
+	if (pData == null)
+		return false;
+	st_FramePara->iAddress = LCD_WriteModuleVolCurAddr;
+	st_FramePara->ucFunCode = D_DP_DataRead; 
+	st_FramePara->ucRegLen = LCD_WriteModuleVolCurlen;
+	return true;	
+}

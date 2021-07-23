@@ -16,8 +16,32 @@ ParamHS paramHS;
 ** HS Volt Cur Limit Init
 */
 void init_HSVolCurLimit(void){
-	paramHS.volLimit = 54.6;
-	paramHS.curLimit =10;
+	uint8 buf[LEN_Cfg_ModuleVolCur],buf_bkp[LEN_Cfg_ModuleVolCur];
+	
+	eeprom_read(EAADR_Cfg_ModuleVolCur,(uint8*)&buf[0],LEN_Cfg_ModuleVolCur);
+	#if  EEPROMDATA_REPAIRDAT_EN == 1
+		BKP_ReadBackupRegDat(EADDR_BKPDATOFFSET + EAADR_Cfg_ModuleVolCur, (uint8*)&buf_bkp[0], LEN_Cfg_ModuleVolCur);
+	#endif
+	if(calcSum((uint8*)&buf[0],LEN_Cfg_ModuleVolCur-1) == buf[LEN_Cfg_ModuleVolCur-1])
+	{
+		memcpy((uint8*)&paramHS.volLimit,(uint8*)&buf[0],sizeof(ParamHS));
+		#if  EEPROMDATA_REPAIRDAT_EN == 1
+			BKP_WriteBackupDat(EADDR_BKPDATOFFSET + EAADR_Cfg_ModuleVolCur, (uint8*)&buf[0], LEN_Cfg_ModuleVolCur);
+		#endif
+	}
+	else if(calcSum((uint8*)&buf_bkp[0],LEN_Cfg_ModuleVolCur-1) == buf_bkp[LEN_Cfg_ModuleVolCur -1])
+	{
+		memcpy((uint8*)&paramHS.volLimit,(uint8*)&buf_bkp[0],sizeof(ParamHS));
+		eeprom_write(EAADR_Cfg_ModuleVolCur,(uint8*)&buf_bkp[0],LEN_Cfg_ModuleVolCur);
+	}
+	else
+	{
+		/*
+		** zy hengsheng Param:vol = 54.6 cur = 10
+		** zy binai Param:vol = 71 cur = 20;
+		*/	
+		set_HSVolCurLimit(71,20);
+	}	
 }
 
 /*
@@ -25,6 +49,23 @@ void init_HSVolCurLimit(void){
 */
 ParamHS get_HSVolCurLimit(void){
 	return paramHS;
+}
+
+/*
+** set HS Vol Cur Limit
+*/
+void set_HSVolCurLimit(uint16 vol,uint16 cur){
+	uint8 buf[LEN_Cfg_ModuleVolCur];
+	
+	paramHS.volLimit = vol;
+	paramHS.curLimit = cur;
+	
+	memcpy((uint8*)&buf[0],(uint8*)&paramHS.volLimit,sizeof(ParamHS));
+	buf[LEN_Cfg_ModuleVolCur-1] = calcSum((uint8*)&buf[0],LEN_Cfg_ModuleVolCur-1);
+	eeprom_write(EAADR_Cfg_ModuleVolCur,(uint8*)&buf[0],LEN_Cfg_ModuleVolCur);
+	#if EEPROMDATA_REPAIRDAT_EN == 1
+		BKP_WriteBackupDat(EADDR_BKPDATOFFSET + EAADR_Cfg_ModuleVolCur, (uint8*)&buf[0], LEN_Cfg_ModuleVolCur);
+	#endif	
 }
 
 void param_GetCardPassword(uint8 *cardPw)

@@ -1,6 +1,8 @@
 #ifndef HMI_DW_DATA_H
 #define HMI_DW_DATA_H
 
+#include "type.h"
+
 #define HMI_PAGEDEEP_NUM								20//设计页面最大深度20
 
 #define HMI_DW_RECORD_NUM							10//一页显示的记录数
@@ -27,6 +29,8 @@
 #define HMI_DW_PAGE_SoftVersion						(uint8)0x04//软件版本号
 
 #define HMI_DW_PAGE_DeviceIdNoLegality				(uint8)0x2B//设备ID非法性
+
+#define HMI_DW_PAGE_CFG_ModuleVolCur			(uint8)0x2E/*配置模块电压电流*/
 
 #if Modify_PW_190822 == 1
 #define HMI_DW_PAGE_ModifyPw_Sys					(uint8)0x07//修改系统密码页面

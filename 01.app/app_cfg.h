@@ -17,7 +17,7 @@
 */
 #define Test_FunModule_ZY					0/*测试振源充电器模块*/
 
-#define SysSoftCtrVersion					102/*恒晟软件版本号以100为起始*/
+#define SysSoftCtrVersion					206/*恒晟软件版本号以100为起始-- 比耐以200起始*/
 
 #define MT622V204							0//CPU--铭特--Pin卡
 #define MT_Card_M1							1//M1卡--量必达科技

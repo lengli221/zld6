@@ -23,6 +23,9 @@ void init_ZYChargerPara(void){
 */
 void update_DoorStateInfo(uint8 dev){
 	static bool chgingTimeUpdateFlag[ALLDOORNUM] = {0};
+	uint32 iParam[3] = {0x01,D_ZY_CMD_Set_OnOff,0};/*关机模块*/
+	static uint8 closeModuleCnt[ALLDOORNUM] = {0};
+	static uint32 closeModuleTick[ALLDOORNUM] = {0};
 
 	if(zy_DoorSysPara->doorState[dev] != doorErr && zy_DoorSysPara->doorState[dev] != doorOptOverTime){
 		/*检测电池是否在线*/
@@ -57,7 +60,7 @@ void update_DoorStateInfo(uint8 dev){
 				}else if(zyChargerInfo[dev].zyGetItem.zyErr.bits.outputVolH == true){
 					zy_DoorSysPara->doorState[dev] = BatOverVolP;
 				}else{
-					zy_DoorSysPara->doorState[dev] = batErr;
+						zy_DoorSysPara->doorState[dev] = batErr;
 				}
 			}
 		}
@@ -76,6 +79,36 @@ void update_DoorStateInfo(uint8 dev){
 				}
 			}
 		}
+	}
+	
+	/*
+	** 20210723
+	** 备注:比耐电池在zy模块下,易报“充电过压保护”-->导致模块反复开机,
+	**	故主控关机模块 -->模块报“充电过压保护”-->转满电-->关机模块
+	*/	
+	if(zyChargerInfo[dev].zyGetItem.zyErr.bits.outputVolH != 0){
+		if(zy_DoorSysPara->doorState[dev] != doorErr && zy_DoorSysPara->doorState[dev] != doorOptOverTime){
+			zy_DoorSysPara->doorState[dev] = BatFull;
+		}
+		
+		if(closeModuleCnt[dev] < 5){
+			if(TickOut((uint32*)&closeModuleTick[dev],200) == true){
+				TickOut((uint32*)&closeModuleTick[dev],0);
+				/*set ZY Charger OnOff*/
+				set_ZY_ChargerOnOff(false, dev);
+				iParam[2] = dev;
+				SM_SetCmd(D_SM_ZY_Charger, (uint32 *)&iParam[0]);	
+				closeModuleCnt[dev]++;
+			}	
+		}
+
+		/*备注:检测电池拔出,才可以更新"充电过压保护"标志位*/
+		if(zyChargerInfo[dev].zyGetItem.batVol < 350){/*电池不在线*/
+			closeModuleCnt[dev] = 0;
+			TickOut((uint32*)&closeModuleTick[dev],0);
+			/*清zy模块状态信息*/
+			memset((uint8*)&zyChargerInfo[dev].zyGetItem.zyErr.flag,0,sizeof(ZY_Err));
+		}	
 	}
 }
 
@@ -111,7 +144,13 @@ static void zy_Parse_ChargerGetStateInfo(uint8* data,uint8 datalen,uint8 dev){
 	offset += 4;/*增加偏移量*/
 
 	memcpy((uint8*)&temp,(uint8*)&data[offset],sizeof(uint16));
-	zyChargerInfo[dev].zyGetItem.zyErr.flag = little_Big_Endian__Exchange(temp);
+	/*
+	**	20210723
+	** 备注:规避电池在"过压保护"的情况下模块反复开关机,报过“过压保护之后”,禁止更新状态
+	*/
+	if(zyChargerInfo[dev].zyGetItem.zyErr.bits.outputVolH == 0){
+		zyChargerInfo[dev].zyGetItem.zyErr.flag = little_Big_Endian__Exchange(temp);
+	}
 	offset += sizeof(uint16);	
 
 	offset += 6;/*增加偏移量*/	

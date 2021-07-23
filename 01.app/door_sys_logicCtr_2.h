@@ -2,6 +2,8 @@
 #define DOOR_SYS_LOGIC_H
 #define DoorSys_CloseChkBatTick					(uint32)5000
 
+#include "type.h"
+
 /*ÏµÍ³²ÖÃÅ×´Ì¬*/
 enum
 {

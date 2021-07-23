@@ -1478,6 +1478,42 @@ void HMI_DW_OptBindingProc(void)
 	hmiSysParam->optCnt++;
 }
 
+/*
+** 20210723
+** 备注:比耐配置电池电压
+*/
+void HMI_DW_Module_VolCur(void){
+	uint32 iParam[3] = {0x01,D_LCD_CMD_WriteCfgVolCur,0x00};
+	ParamHS pHs = get_HSVolCurLimit();
+	int8 setResult = -1;
+	
+	switch(thispage.state){
+		case 0:
+			set_ModuleVolCurToLcd(pHs.volLimit,pHs.curLimit);
+			SM_SetCmd(D_SM_TASKID_LCD, (uint32 *)&iParam[0]);
+			thispage.state++;
+			break;
+		case 1:
+			iParam[1] = D_LCD_CMD_ReadCfgVolCur;
+			SM_SetCmd(D_SM_TASKID_LCD, (uint32 *)&iParam[0]);
+			thispage.state++;
+			break;
+		case 2:
+			setResult = chk_ModuleVolCurCfgIsLegal();
+			if(setResult != -1){
+				if(setResult == 1){
+					thispage.state = 0;
+				}else{/*参数配置成功,复位主控,配置模块*/
+					Sleep(200);
+					NVIC_SystemReset();
+				}
+			}else{
+				thispage.state = 1;
+			}
+			break;
+	}
+}
+
 const HMI_DW_PAGE hmi_DW_PageTable[] =
 {
 	{HMI_DW_PAGE_MAIN,0,HMI_DW_MainPage},
@@ -1510,6 +1546,8 @@ const HMI_DW_PAGE hmi_DW_PageTable[] =
 	#if Modify_Key_190826 == 1
 	{HMI_DW_PAGE_Modify_Key,0,HMI_DW_ModifyCardKey},
 	#endif
+	
+	{HMI_DW_PAGE_CFG_ModuleVolCur,0,HMI_DW_Module_VolCur}
 };
 uint8 hmi_DW_PageTableNum = sizeof(hmi_DW_PageTable)/sizeof(HMI_DW_PAGE);
 

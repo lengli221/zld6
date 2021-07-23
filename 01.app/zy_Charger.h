@@ -1,6 +1,7 @@
 #ifndef __ZY_CHARGER_H_
 #define __ZY_CHARGER_H_
 
+#include "type.h"
 
 #define D_ZY_CMD_Get_State													0x01
 #define D_ZY_CMD_Set_VoltCur												0x02
